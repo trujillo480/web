@@ -5,7 +5,6 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const connectedUsers = new Set();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -21,57 +20,64 @@ const io = new Server(server, {
 });
 
 const messageHistory = [];
+const connectedUsers = new Set();
 
 io.on('connection', (socket) => {
-  console.log('Usuario conectado');
+  console.log('✅ Usuario conectado');
 
   socket.emit('chat history', messageHistory);
 
   socket.on('user joined', (username) => {
-  if (connectedUsers.has(username)) {
-    socket.emit('chat message', {
-      user: 'Sistema',
-      message: `El nombre "${username}" ya está en uso. Por favor elige otro.`
-    });
-    return;
-  }
-  socket.username = username;
-  connectedUsers.add(username);
-  io.emit('user list', Array.from(connectedUsers));
-  io.emit('chat message', {
-    user: 'Sistema',
-    message: `${username} se ha unido al chat`
-  });
-});
+    if (connectedUsers.has(username)) {
+      socket.emit('chat message', {
+        user: 'Sistema',
+        message: `⚠️ El nombre "${username}" ya está en uso. Por favor elige otro.`
+      });
+      return;
+    }
 
-  socket.on('chat message', (data) => {
-  const msg = {
-    user: socket.username || 'Anónimo',
-    message: data.message
-  };
-  messageHistory.push(msg);
-  if (messageHistory.length > 100) {
-    messageHistory.shift();
-  }
-  io.emit('chat message', msg);
-});
+    socket.username = username;
+    connectedUsers.add(username);
 
-  socket.on('disconnect', () => {
-  if (socket.username) {
+    io.emit('user list', Array.from(connectedUsers));
+
     io.emit('chat message', {
       user: 'Sistema',
-      message: `${socket.username} salió del chat`
+      message: `✅ ${username} se ha unido al chat`
     });
-  }
-  if (socket.username) {
-  connectedUsers.delete(socket.username);
-  io.emit('user list', Array.from(connectedUsers));
-  }
-  console.log('Usuario desconectado');
- });
+  });
+
+  socket.on('chat message', (data) => {
+    const msg = {
+      user: socket.username || 'Anónimo',
+      message: data.message
+    };
+
+    messageHistory.push(msg);
+    if (messageHistory.length > 100) {
+      messageHistory.shift(); 
+    }
+
+    io.emit('chat message', msg);
+  });
+
+  socket.on('disconnect', () => {
+    if (socket.username) {
+      connectedUsers.delete(socket.username);
+
+      io.emit('user list', Array.from(connectedUsers));
+
+      io.emit('chat message', {
+        user: 'Sistema',
+        message: `❌ ${socket.username} salió del chat`
+      });
+    }
+
+    console.log('❎ Usuario desconectado');
+  });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`Servidor Socket.IO en puerto ${PORT}`);
+  console.log(`🚀 Servidor Socket.IO corriendo en http://localhost:${PORT}`);
 });
