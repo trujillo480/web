@@ -22,25 +22,29 @@ startBtn.addEventListener('click', () => {
 });
 
 form.addEventListener('submit', function(e) {
-  e.preventDefault();
-  if (input.value) {
-    socket.emit('chat message', `${username}: ${input.value}`);
-    input.value = '';
-  }
+  e.preventDefault();
+  if (input.value) {
+    socket.emit('chat message', {
+      user: username,
+      message: input.value
+    });
+    input.value = '';
+  }
 });
 
-socket.on('chat message', function(msg) {
-  const item = document.createElement('div');
-  item.textContent = msg;
-  messages.appendChild(item);
-  messages.scrollTop = messages.scrollHeight;
+socket.on('chat message', function(data) {
+  const item = document.createElement('div');
+  item.textContent = `${data.user}: ${data.message}`;
+  messages.appendChild(item);
+  messages.scrollTop = messages.scrollHeight;
 });
+
 
 socket.on('chat history', (history) => {
-  history.forEach((msg) => {
-    const item = document.createElement('div');
-    item.textContent = msg;
-    messages.appendChild(item);
-  });
-  messages.scrollTop = messages.scrollHeight;
+  history.forEach((data) => {
+    const item = document.createElement('div');
+    item.textContent = `${data.user}: ${data.message}`;
+    messages.appendChild(item);
+  });
+  messages.scrollTop = messages.scrollHeight;
 });
