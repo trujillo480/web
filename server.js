@@ -26,19 +26,19 @@ io.on('connection', (socket) => {
 
   socket.emit('chat history', messageHistory);
 
-  socket.on('join', (username) => {
-    socket.username = username;
-    io.emit('user joined', username);
-  });
+  socket.on('user joined', (username) => {
+  socket.username = username;
+  io.emit('user joined', username);
+});
 
   socket.on('chat message', (data) => {
-    const msg = {
-      user: socket.username || 'Anónimo',
-      message: data.message
-    };
-    messageHistory.push(msg);
-    io.emit('chat message', msg);
-  });
+  const msg = {
+    user: socket.username || 'Anónimo',
+    message: data.message
+  };
+  messageHistory.push(msg);
+  io.emit('chat message', msg);
+});
 
   socket.on('disconnect', () => {
     console.log('Usuario desconectado');
