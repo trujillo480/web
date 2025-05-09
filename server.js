@@ -5,6 +5,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const connectedUsers = new Set();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -27,8 +28,20 @@ io.on('connection', (socket) => {
   socket.emit('chat history', messageHistory);
 
   socket.on('user joined', (username) => {
+  if (connectedUsers.has(username)) {
+    socket.emit('chat message', {
+      user: 'Sistema',
+      message: `El nombre "${username}" ya está en uso. Por favor elige otro.`
+    });
+    return;
+  }
   socket.username = username;
-  io.emit('user joined', username);
+  connectedUsers.add(username);
+  io.emit('user list', Array.from(connectedUsers));
+  io.emit('chat message', {
+    user: 'Sistema',
+    message: `${username} se ha unido al chat`
+  });
 });
 
   socket.on('chat message', (data) => {
@@ -49,6 +62,10 @@ io.on('connection', (socket) => {
       user: 'Sistema',
       message: `${socket.username} salió del chat`
     });
+  }
+  if (socket.username) {
+  connectedUsers.delete(socket.username);
+  io.emit('user list', Array.from(connectedUsers));
   }
   console.log('Usuario desconectado');
  });
