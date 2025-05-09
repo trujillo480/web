@@ -8,6 +8,9 @@ const chatContainer = document.getElementById('chat-container');
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messages = document.getElementById('messages');
+const userListContainer = document.createElement('div');
+userListContainer.id = 'user-list';
+chatContainer.insertBefore(userListContainer, messages);
 
 let username = localStorage.getItem('username') || '';
 
@@ -39,6 +42,12 @@ form.addEventListener('submit', function(e) {
   }
 });
 
+socket.on('user list', (users) => {
+  userListContainer.innerHTML = '<strong>Usuarios conectados:</strong><br>' +
+    users.map(user => `• ${user}`).join('<br>');
+});
+
+
 socket.on('chat message', function(data) {
   const item = document.createElement('div');
   item.textContent = `${data.user}: ${data.message}`;
@@ -47,6 +56,7 @@ socket.on('chat message', function(data) {
 });
 
 socket.on('chat history', (history) => {
+  messages.innerHTML = '';
   history.forEach((data) => {
     const item = document.createElement('div');
     item.textContent = `${data.user}: ${data.message}`;
