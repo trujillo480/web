@@ -77,3 +77,15 @@ body {
   background: #f0f0f0;
   border-radius: 5px;
 }
+
+#emoji-wrapper {
+  position: relative;
+}
+
+#emoji-picker {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  display: none;
+  z-index: 10;
+}
