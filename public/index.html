@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat en Vivo</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
-    #chat-container { max-width: 600px; margin: 50px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    #messages { height: 300px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
-    #messages div { margin: 5px 0; }
-    #form { display: flex; }
-    #input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-    #send { padding: 10px; margin-left: 10px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="chat-container">
+  <div id="username-modal" class="modal">
+    <div class="modal-content">
+      <h2>Bienvenido</h2>
+      <input type="text" id="username-input" placeholder="Ingresa tu nombre">
+      <button id="start-chat">Entrar</button>
+    </div>
+  </div>
+
+  <div id="chat-container" style="display: none;">
     <h2>Chat en Vivo</h2>
     <div id="messages"></div>
     <form id="form">
@@ -25,41 +25,6 @@
   </div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script>
-  const socket = io();
-  const form = document.getElementById('form');
-  const input = document.getElementById('input');
-  const messages = document.getElementById('messages');
-
-  let username = prompt("Ingresa tu nombre:");
-
-  socket.emit('join', username);
-
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (input.value) {
-      socket.emit('chat message', {
-        user: username,
-        text: input.value
-      });
-      input.value = '';
-    }
-  });
-
-  socket.on('chat message', function(msg) {
-    const item = document.createElement('div');
-    item.textContent = `${msg.user}: ${msg.text}`;
-    messages.appendChild(item);
-    messages.scrollTop = messages.scrollHeight;
-  });
-
-  socket.on('user joined', (name) => {
-    const item = document.createElement('div');
-    item.textContent = `✅ ${name} se unió al chat`;
-    item.style.fontStyle = 'italic';
-    item.style.color = 'gray';
-    messages.appendChild(item);
-  });
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
