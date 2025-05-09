@@ -30,7 +30,7 @@ startBtn.addEventListener('click', () => {
 
 form.addEventListener('submit', function(e) {
   e.preventDefault();
-  if (input.value) {
+  if (input.value.trim()) {
     socket.emit('chat message', {
       user: username,
       message: input.value
@@ -53,8 +53,4 @@ socket.on('chat history', (history) => {
     messages.appendChild(item);
   });
   messages.scrollTop = messages.scrollHeight;
-});
-
-window.addEventListener('beforeunload', () => {
-  localStorage.removeItem('username'); 
 });
