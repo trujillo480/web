@@ -37,12 +37,21 @@ io.on('connection', (socket) => {
     message: data.message
   };
   messageHistory.push(msg);
+  if (messageHistory.length > 100) {
+    messageHistory.shift();
+  }
   io.emit('chat message', msg);
 });
 
   socket.on('disconnect', () => {
-    console.log('Usuario desconectado');
-  });
+  if (socket.username) {
+    io.emit('chat message', {
+      user: 'Sistema',
+      message: `${socket.username} salió del chat`
+    });
+  }
+  console.log('Usuario desconectado');
+ });
 });
 
 const PORT = process.env.PORT || 3000;
