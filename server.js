@@ -24,14 +24,23 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('Usuario conectado');
 
+  socket.on('join', (username) => {
+    socket.username = username;
+    io.emit('user joined', username);
+  });
+
   socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+    io.emit('chat message', {
+      user: socket.username || 'Anónimo',
+      text: msg.text || msg
+    });
   });
 
   socket.on('disconnect', () => {
     console.log('Usuario desconectado');
   });
 });
+
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
