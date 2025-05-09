@@ -19,11 +19,13 @@
     <h2>Chat en Vivo</h2>
     <div id="messages"></div>
     <form id="form">
-      <button id="toggle-emoji-picker" type="button">😀</button>
-      <emoji-picker id="emoji-picker"></emoji-picker>
-      <input id="input" autocomplete="off" placeholder="Escribe tu mensaje..." />
-      <button id="send">Enviar</button>
-    </form>
+  <div id="emoji-wrapper">
+    <button id="toggle-emoji-picker" type="button">😀</button>
+    <emoji-picker id="emoji-picker"></emoji-picker>
+  </div>
+  <input id="input" autocomplete="off" placeholder="Escribe tu mensaje..." />
+  <button id="send">Enviar</button>
+</form>
   </div>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
