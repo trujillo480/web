@@ -20,7 +20,8 @@ const io = new Server(server, {
 });
 
 const messageHistory = [];
-const connectedUsers = new Set();
+const connectedUsers = new Map();       
+const disconnectTimers = new Map();     
 
 io.on('connection', (socket) => {
   console.log('✅ Usuario conectado');
@@ -28,23 +29,20 @@ io.on('connection', (socket) => {
   socket.emit('chat history', messageHistory);
 
   socket.on('user joined', (username) => {
-    if (connectedUsers.has(username)) {
-      socket.emit('chat message', {
+    socket.username = username;
+
+    if (disconnectTimers.has(username)) {
+      clearTimeout(disconnectTimers.get(username));
+      disconnectTimers.delete(username);
+    } else {
+      io.emit('chat message', {
         user: 'Sistema',
-        message: `⚠️ El nombre "${username}" ya está en uso. Por favor elige otro.`
+        message: `✅ ${username} se ha unido al chat`
       });
-      return;
     }
 
-    socket.username = username;
-    connectedUsers.add(username);
-
-    io.emit('user list', Array.from(connectedUsers));
-
-    io.emit('chat message', {
-      user: 'Sistema',
-      message: `✅ ${username} se ha unido al chat`
-    });
+    connectedUsers.set(username, socket.id);
+    io.emit('user list', Array.from(connectedUsers.keys()));
   });
 
   socket.on('chat message', (data) => {
@@ -55,22 +53,30 @@ io.on('connection', (socket) => {
 
     messageHistory.push(msg);
     if (messageHistory.length > 100) {
-      messageHistory.shift(); 
+      messageHistory.shift();
     }
 
     io.emit('chat message', msg);
   });
 
   socket.on('disconnect', () => {
-    if (socket.username) {
-      connectedUsers.delete(socket.username);
+    const username = socket.username;
+    if (username) {
+      const timeout = setTimeout(() => {
+        connectedUsers.delete(username);
+        disconnectTimers.delete(username);
 
-      io.emit('user list', Array.from(connectedUsers));
+        io.emit('user list', Array.from(connectedUsers.keys()));
 
-      io.emit('chat message', {
-        user: 'Sistema',
-        message: `❌ ${socket.username} salió del chat`
-      });
+        io.emit('chat message', {
+          user: 'Sistema',
+          message: `❌ ${username} salió del chat`
+        });
+
+        console.log(`🕒 ${username} fue removido después de 10 segundos de inactividad`);
+      }, 10000); 
+
+      disconnectTimers.set(username, timeout);
     }
 
     console.log('❎ Usuario desconectado');
