@@ -10,7 +10,6 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 const server = http.createServer(app);
@@ -20,31 +19,31 @@ const io = new Server(server, {
   }
 });
 
+const messageHistory = [];
+
 io.on('connection', (socket) => {
-  console.log('Usuario conectado');
+  console.log('Usuario conectado');
 
-  socket.emit('chat history', messageHistory);
+  socket.emit('chat history', messageHistory);
 
-  socket.on('join', (username) => {
-    socket.username = username;
-    io.emit('user joined', username);
-  });
+  socket.on('join', (username) => {
+    socket.username = username;
+    io.emit('user joined', username);
+  });
 
-  socket.on('chat message', (data) => {
-    const msg = {
-      user: socket.username || 'Anónimo',
-      message: data.message
-    };
-    messageHistory.push(msg);
-    io.emit('chat message', msg);
-  });
+  socket.on('chat message', (data) => {
+    const msg = {
+      user: socket.username || 'Anónimo',
+      message: data.message
+    };
+    messageHistory.push(msg);
+    io.emit('chat message', msg);
+  });
 
-  socket.on('disconnect', () => {
-    console.log('Usuario desconectado');
-  });
+  socket.on('disconnect', () => {
+    console.log('Usuario desconectado');
+  });
 });
-
-socket.emit('chat history', messageHistory);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
