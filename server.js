@@ -28,23 +28,25 @@ io.on('connection', (socket) => {
     io.emit('user joined', username);
   });
 
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', {
-      user: socket.username || 'Anónimo',
-      text: msg.text || msg
-    });
-  });
+  const messageHistory = [];
+
+socket.on('chat message', (data) => {
+  const msg = {
+    user: socket.username || 'Anónimo',
+    message: data.message
+  };
+  messageHistory.push(msg);
+  io.emit('chat message', msg);
+});
 
   socket.on('disconnect', () => {
     console.log('Usuario desconectado');
   });
 });
 
+socket.emit('chat history', messageHistory);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Servidor Socket.IO en puerto ${PORT}`);
 });
-
-
-
