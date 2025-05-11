@@ -1,48 +1,69 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f5f5f5;
+/* ========== Variables ========== */
+:root {
+  --font: Arial, sans-serif;
+  --bg-light: #f5f5f5;
+  --bg-white: #fff;
+  --bg-gray: #f0f0f0;
+  --border-color: #ccc;
+  --btn-color: #4CAF50;
+  --shadow: 0 0 10px rgba(0,0,0,0.1);
+  --radius: 8px;
+  --padding: 10px;
 }
 
+/* ========== Global ========== */
+body {
+  font-family: var(--font);
+  margin: 0;
+  padding: 0;
+  background: var(--bg-light);
+}
+
+/* ========== Containers ========== */
 #chat-container {
   max-width: 600px;
   margin: 50px auto;
   padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+#messages, #user-list {
+  border: 1px solid var(--border-color);
+  padding: var(--padding);
+  margin-bottom: 10px;
+  border-radius: 5px;
 }
 
 #messages {
   height: 300px;
   overflow-y: scroll;
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin-bottom: 10px;
 }
 
+/* ========== Form ========== */
 #form {
   display: flex;
+  gap: 10px;
 }
 
 #input {
   flex: 1;
-  padding: 10px;
+  padding: var(--padding);
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
 #send {
-  padding: 10px;
-  margin-left: 10px;
-  background: #4CAF50;
+  padding: var(--padding);
+  background: var(--btn-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
+/* ========== Modal ========== */
 .modal {
   position: fixed;
   top: 0;
@@ -56,28 +77,21 @@ body {
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-white);
   padding: 30px;
   border-radius: 10px;
   text-align: center;
 }
 
 #username-input {
-  padding: 10px;
+  padding: var(--padding);
   margin-top: 10px;
   width: 80%;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
 }
 
-#user-list {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: #f0f0f0;
-  border-radius: 5px;
-}
-
+/* ========== Emoji Picker ========== */
 #emoji-wrapper {
   position: relative;
 }
@@ -87,5 +101,6 @@ body {
   bottom: 40px;
   left: 0;
   display: none;
+  max-width: 250px;
   z-index: 10;
 }
