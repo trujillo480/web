@@ -32,9 +32,16 @@ socket.on('user list', (users) => {
   userList.innerHTML = `<strong>Usuarios conectados:</strong><br>${users.map(u => `• ${u}`).join('<br>')}`;
 });
 
+const convertLinks = (text) => {
+  return text.replace(
+    /(https?:\/\/[^\s]+)/g,
+    (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+  );
+};
+
 const appendMessage = ({ user, message }) => {
   const item = document.createElement('div');
-  item.textContent = `${user}: ${message}`;
+  item.innerHTML = `<strong>${user}:</strong> ${convertLinks(message)}`;
   messages.appendChild(item);
   messages.scrollTop = messages.scrollHeight;
 };
