@@ -1,32 +1,23 @@
 const socket = io();
 
-const modal = document.getElementById('username-modal');
-const usernameInput = document.getElementById('username-input');
-const startBtn = document.getElementById('start-chat');
 const chatContainer = document.getElementById('chat-container');
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messages = document.getElementById('messages');
 const userList = document.getElementById('user-list');
 
-let username = localStorage.getItem('username') || '';
+let username = localStorage.getItem('username');
+
+if (!username) {
+  window.location.href = 'login.html';
+}
 
 const showChat = () => {
-  modal.style.display = 'none';
   chatContainer.style.display = 'block';
   socket.emit('user joined', username);
 };
 
-if (username) showChat();
-
-startBtn.addEventListener('click', () => {
-  const name = usernameInput.value.trim();
-  if (name) {
-    username = name;
-    localStorage.setItem('username', username);
-    showChat();
-  }
-});
+showChat();
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
