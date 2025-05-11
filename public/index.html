@@ -6,6 +6,9 @@
   <title>Chat en Vivo</title>
   <link rel="stylesheet" href="style.css">
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+  <script defer src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script defer src="emoji.js"></script>
+  <script defer src="script.js"></script>
 </head>
 <body>
   <div id="username-modal" class="modal">
@@ -18,8 +21,8 @@
 
   <div id="chat-container" style="display: none;">
     <h2>Chat en Vivo</h2>
+    <div id="user-list"></div>
     <div id="messages"></div>
-    
     <form id="form">
       <div id="emoji-wrapper">
         <button id="toggle-emoji-picker" type="button">😀</button>
@@ -29,9 +32,5 @@
       <button id="send">Enviar</button>
     </form>
   </div>
-
-  <script src="emoji.js"></script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="script.js"></script>
 </body>
 </html>
