@@ -13,19 +13,14 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-  }
-});
+const io = new Server(server, { cors: { origin: '*' } });
 
 const messageHistory = [];
-const connectedUsers = new Map();       
-const disconnectTimers = new Map();     
+const connectedUsers = new Map();
+const disconnectTimers = new Map();
 
 io.on('connection', (socket) => {
   console.log('✅ Usuario conectado');
-
   socket.emit('chat history', messageHistory);
 
   socket.on('user joined', (username) => {
@@ -42,19 +37,17 @@ io.on('connection', (socket) => {
     }
 
     connectedUsers.set(username, socket.id);
-    io.emit('user list', Array.from(connectedUsers.keys()));
+    io.emit('user list', [...connectedUsers.keys()]);
   });
 
-  socket.on('chat message', (data) => {
+  socket.on('chat message', ({ message }) => {
     const msg = {
       user: socket.username || 'Anónimo',
-      message: data.message
+      message
     };
 
     messageHistory.push(msg);
-    if (messageHistory.length > 100) {
-      messageHistory.shift();
-    }
+    if (messageHistory.length > 100) messageHistory.shift();
 
     io.emit('chat message', msg);
   });
@@ -65,25 +58,20 @@ io.on('connection', (socket) => {
       const timeout = setTimeout(() => {
         connectedUsers.delete(username);
         disconnectTimers.delete(username);
-
-        io.emit('user list', Array.from(connectedUsers.keys()));
-
+        io.emit('user list', [...connectedUsers.keys()]);
         io.emit('chat message', {
           user: 'Sistema',
           message: `❌ ${username} salió del chat`
         });
-
-        console.log(`🕒 ${username} fue removido después de 10 segundos de inactividad`);
-      }, 10000); 
-
+        console.log(`🕒 ${username} fue removido después de 10 segundos`);
+      }, 10000);
       disconnectTimers.set(username, timeout);
     }
-
     console.log('❎ Usuario desconectado');
   });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`🚀 Servidor Socket.IO corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
