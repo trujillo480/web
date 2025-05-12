@@ -8,6 +8,11 @@ export const setupSocket = (io) => {
     socket.emit('chat history', messageHistory);
 
     socket.on('user joined', (username) => {
+        if (connectedUsers.has(username)) {
+      socket.emit('username error', 'El nombre ya está en uso.');
+      return;
+      }
+
       socket.username = username;
 
       if (disconnectTimers.has(username)) {
@@ -19,6 +24,10 @@ export const setupSocket = (io) => {
           message: `✅ ${username} se ha unido al chat`
         });
       }
+
+      connectedUsers.set(username, socket.id);
+      io.emit('user list', [...connectedUsers.keys()]);
+    });
 
       connectedUsers.set(username, socket.id);
       io.emit('user list', [...connectedUsers.keys()]);
