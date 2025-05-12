@@ -21,11 +21,21 @@ const convertLinks = (text) => {
   );
 };
 
-const appendMessage = ({ user, message }) => {
-  const item = document.createElement('div');
-  item.innerHTML = `<strong>${sanitize(user)}:</strong> <span>${convertLinks(sanitize(message))}</span>`;
-  messages.appendChild(item);
-  messages.scrollTop = messages.scrollHeight;
+const appendMessage = ({ user, message, filename, filetype, content }) => {
+  const item = document.createElement('div');
+  let html = `<strong>${sanitize(user)}:</strong> `;
+
+  if (content && filetype.startsWith('image/')) {
+    html += `<br><img src="${content}" alt="${filename}" style="max-width: 200px;" />`;
+  } else if (content) {
+    html += `<br><a href="${content}" download="${filename}">${filename}</a>`;
+  } else {
+    html += `<span>${convertLinks(sanitize(message))}</span>`;
+  }
+
+  item.innerHTML = html;
+  messages.appendChild(item);
+  messages.scrollTop = messages.scrollHeight;
 };
 
 const showChat = () => {
@@ -34,12 +44,31 @@ const showChat = () => {
   input.focus();
 };
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const msg = input.value.trim();
-  if (!msg) return;
-  socket.emit('chat message', { user: username, message: msg });
-  input.value = '';
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const msg = input.value.trim();
+  const file = document.getElementById('file-input').files[0];
+
+  if (!msg && !file) return;
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      socket.emit('file upload', {
+        user: username,
+        filename: file.name,
+        filetype: file.type,
+        content: reader.result
+      });
+    };
+    reader.readAsDataURL(file);
+  } else {
+    socket.emit('chat message', { user: username, message: msg });
+  }
+
+  input.value = '';
+  document.getElementById('file-input').value = '';
 });
 
 socket.on('chat message', appendMessage);
