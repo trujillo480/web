@@ -36,6 +36,13 @@ export const setupSocket = (io) => {
       io.emit('chat message', msg);
     });
 
+socket.on('file upload', ({ user, filename, filetype, content }) => {
+  const fileMsg = { user, filename, filetype, content };
+  messageHistory.push(fileMsg);
+  if (messageHistory.length > 100) messageHistory.shift();
+  io.emit('chat message', fileMsg);
+});
+
     socket.on('disconnect', () => {
       const { username } = socket;
       if (!username) return;
