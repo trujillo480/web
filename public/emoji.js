@@ -13,4 +13,10 @@ if (emojiPicker && toggleEmojiBtn && inputField) {
     inputField.value += e.detail.unicode;
     inputField.focus();
   });
+
+  document.addEventListener('click', (e) => {
+    if (!emojiPicker.contains(e.target) && e.target !== toggleEmojiBtn) {
+      emojiPicker.style.display = 'none';
+    }
+  });
 }
