@@ -40,9 +40,20 @@ const convertLinks = (text) => {
   );
 };
 
+const sanitize = (text) => {
+  const temp = document.createElement('div');
+  temp.textContent = text; 
+  return temp.innerHTML;
+};
+
 const appendMessage = ({ user, message }) => {
   const item = document.createElement('div');
-  item.innerHTML = `<strong>${user}:</strong> ${convertLinks(message)}`;
+  item.innerHTML = `<strong>${user}:</strong> `;
+
+  const span = document.createElement('span');
+  span.innerHTML = convertLinks(sanitize(message)); 
+  item.appendChild(span);
+
   messages.appendChild(item);
   messages.scrollTop = messages.scrollHeight;
 };
