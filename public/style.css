@@ -72,6 +72,15 @@ body {
   z-index: 10;
 }
 /* ========== Login Box ========== */
+.login-modal {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .login-box {
   width: 100%;
   max-width: 400px;
