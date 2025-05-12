@@ -15,6 +15,7 @@ if (!username) {
 const showChat = () => {
   chatContainer.style.display = 'block';
   socket.emit('user joined', username);
+  input.focus();
 };
 
 showChat();
