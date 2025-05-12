@@ -51,4 +51,10 @@ socket.on('user list', (users) => {
   userList.innerHTML = `<strong>Usuarios conectados:</strong><br>${users.map(u => `• ${u}`).join('<br>')}`;
 });
 
+socket.on('username error', (msg) => {
+  alert(msg); 
+  localStorage.removeItem('username'); 
+  window.location.href = 'login.html'; 
+});
+
 showChat();
