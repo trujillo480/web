@@ -121,3 +121,25 @@ body {
 .login-box button:hover {
   background-color: #45a049;
 }
+/* ======== documento ========*/
+.file-upload {
+  position: relative;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-upload label {
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.file-upload label:hover {
+  background-color: #d5d5d5;
+}
