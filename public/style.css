@@ -71,3 +71,44 @@ body {
   max-width: 250px;
   z-index: 10;
 }
+/* ========== Login Box ========== */
+.login-box {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-white);
+  padding: 30px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.login-box input {
+  width: 100%;
+  padding: var(--padding);
+  margin-bottom: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.login-box button {
+  width: 100%;
+  padding: var(--padding);
+  background-color: var(--btn-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-box button:hover {
+  background-color: #45a049;
+}
