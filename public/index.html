@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat en Vivo</title>
   <link rel="stylesheet" href="style.css">
-  <script defer src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+  <script defer src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script defer src="emoji.js"></script>
   <script defer src="script.js"></script>
 </head>
@@ -22,6 +22,10 @@
         <emoji-picker id="emoji-picker" style="max-width: 250px;"></emoji-picker>
       </div>
       <input id="input" placeholder="Escribe tu mensaje..." />
+      <div class="file-upload">
+      <label for="file-input">📎 Adjuntar</label>
+      <input type="file" id="file-input" />
+      </div>
       <button id="send" type="submit">Enviar</button>
     </form>
   </div>
