@@ -26,7 +26,7 @@ const appendMessage = ({ user, message, filename, filetype }) => {
   let html = `<strong>${sanitize(user)}:</strong> `;
 
   if (filetype?.startsWith('image/') && message.startsWith('http')) {
-    html += `<br><img src="${message}" alt="${filename}" style="max-width: 200px;" />`;
+    html += `<br><img src="${message}" alt="${filename}" style="max-width: 200px; border-radius: 8px;" />`;
 
   } else if (filetype && message.startsWith('http')) {
     html += `<br><a href="${message}" target="_blank" download>📎 ${filename}</a>`;
