@@ -21,16 +21,16 @@ const convertLinks = (text) => {
   );
 };
 
-const appendMessage = ({ user, message, filename, filetype }) => {
+const appendMessage = ({ user, message, filename }) => {
   const item = document.createElement('div');
   let html = `<strong>${sanitize(user)}:</strong> `;
 
-  if (filetype?.startsWith('image/') && message.startsWith('http')) {
-    html += `<br><img src="${message}" alt="${filename}" style="max-width: 200px; border-radius: 8px;" />`;
+  const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(message);
 
-  } else if (filetype && message.startsWith('http')) {
-    html += `<br><a href="${message}" target="_blank" download>📎 ${filename}</a>`;
-
+  if (isImage && message.startsWith('http')) {
+    html += `<br><img src="${message}" alt="${filename || 'imagen'}" style="max-width: 200px; border-radius: 8px;" />`;
+  } else if (message.startsWith('http')) {
+    html += `<br><a href="${message}" target="_blank" download>📎 ${filename || 'Archivo'}</a>`;
   } else {
     html += `<span>${convertLinks(sanitize(message))}</span>`;
   }
@@ -39,7 +39,6 @@ const appendMessage = ({ user, message, filename, filetype }) => {
   messages.appendChild(item);
   messages.scrollTop = messages.scrollHeight;
 };
-
 
 const showChat = () => {
   chatContainer.hidden = false;
