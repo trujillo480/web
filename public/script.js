@@ -21,14 +21,16 @@ const convertLinks = (text) => {
   );
 };
 
-const appendMessage = ({ user, message, filename, filetype, content }) => {
+const appendMessage = ({ user, message, filename, filetype }) => {
   const item = document.createElement('div');
   let html = `<strong>${sanitize(user)}:</strong> `;
 
-  if (content && filetype.startsWith('image/')) {
-    html += `<br><img src="${content}" alt="${filename}" style="max-width: 200px;" />`;
-  } else if (content) {
-    html += `<br><a href="${content}" download="${filename}">${filename}</a>`;
+  if (filetype?.startsWith('image/') && message.startsWith('http')) {
+    html += `<br><img src="${message}" alt="${filename}" style="max-width: 200px;" />`;
+
+  } else if (filetype && message.startsWith('http')) {
+    html += `<br><a href="${message}" target="_blank" download>📎 ${filename}</a>`;
+
   } else {
     html += `<span>${convertLinks(sanitize(message))}</span>`;
   }
@@ -38,10 +40,28 @@ const appendMessage = ({ user, message, filename, filetype, content }) => {
   messages.scrollTop = messages.scrollHeight;
 };
 
+
 const showChat = () => {
   chatContainer.hidden = false;
   socket.emit('user joined', username);
   input.focus();
+};
+
+const uploadToCloudinary = async (file) => {
+  const url = 'https://api.cloudinary.com/v1_1/daoks8k0s/upload';
+  const preset = 'chat_unsigned';
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', preset);
+
+  const res = await fetch(url, {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await res.json();
+  return data.secure_url;
 };
 
 form.addEventListener('submit', async (e) => {
@@ -53,16 +73,13 @@ form.addEventListener('submit', async (e) => {
   if (!msg && !file) return;
 
   if (file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      socket.emit('file upload', {
-        user: username,
-        filename: file.name,
-        filetype: file.type,
-        content: reader.result
-      });
-    };
-    reader.readAsDataURL(file);
+    const fileUrl = await uploadToCloudinary(file);
+    socket.emit('chat message', {
+      user: username,
+      message: fileUrl,
+      filename: file.name,
+      filetype: file.type
+    });
   } else {
     socket.emit('chat message', { user: username, message: msg });
   }
