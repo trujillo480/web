@@ -8,26 +8,30 @@ export const setupSocket = (io) => {
     socket.emit('chat history', messageHistory);
 
     socket.on('user joined', (username) => {
-      if (connectedUsers.has(username)) {
-        socket.emit('username error', 'El nombre ya está en uso.');
-        return;
-      }
+  const existingSocketId = connectedUsers.get(username);
 
-      socket.username = username;
+  if (connectedUsers.has(username) && existingSocketId !== socket.id) {
+    if (disconnectTimers.has(username)) {
+      clearTimeout(disconnectTimers.get(username));
+      disconnectTimers.delete(username);
+    } else {
+      socket.emit('username error', 'El nombre ya está en uso.');
+      return;
+    }
+  }
 
-      if (disconnectTimers.has(username)) {
-        clearTimeout(disconnectTimers.get(username));
-        disconnectTimers.delete(username);
-      } else {
-        io.emit('chat message', {
-          user: 'Sistema',
-          message: `✅ ${username} se ha unido al chat`
-        });
-      }
+  socket.username = username;
 
-      connectedUsers.set(username, socket.id);
-      io.emit('user list', [...connectedUsers.keys()]);
-    });
+  if (!disconnectTimers.has(username)) {
+    io.emit('chat message', {
+      user: 'Sistema',
+      message: `✅ ${username} se ha unido al chat`
+    });
+  }
+
+  connectedUsers.set(username, socket.id);
+  io.emit('user list', [...connectedUsers.keys()]);
+});
 
     socket.on('chat message', ({ message }) => {
       const msg = { user: socket.username || 'Anónimo', message };
