@@ -23,6 +23,8 @@ const convertLinks = (text) => {
 };
 
 const appendMessage = ({ user, message, filename }) => {
+  if (!message || typeof message !== 'string') return; // PREVIENE errores si message es undefined
+
   const item = document.createElement('div');
   let html = `<strong>${sanitize(user)}:</strong> `;
 
@@ -47,6 +49,11 @@ const showChat = () => {
   input.focus();
 };
 
+const resetForm = () => {
+  input.value = '';
+  fileInput.value = '';
+};
+
 const uploadToCloudinary = async (file) => {
   const url = 'https://api.cloudinary.com/v1_1/daoks8k0s/upload';
   const preset = 'chat_unsigned';
@@ -61,12 +68,8 @@ const uploadToCloudinary = async (file) => {
   });
 
   const data = await res.json();
+  if (!data.secure_url) throw new Error('Upload fallido');
   return data.secure_url;
-};
-
-const resetForm = () => {
-  input.value = '';
-  fileInput.value = '';
 };
 
 form.addEventListener('submit', async (e) => {
@@ -78,6 +81,11 @@ form.addEventListener('submit', async (e) => {
   if (!msg && !file) return;
 
   if (file) {
+    // Opcional: advertencia de peso, pero no bloquea
+    if (file.size > 10 * 1024 * 1024) {
+      alert('⚠️ El archivo pesa más de 10MB. Puede fallar si Cloudinary no lo permite.');
+    }
+
     try {
       const fileUrl = await uploadToCloudinary(file);
       socket.emit('chat message', {
@@ -87,7 +95,8 @@ form.addEventListener('submit', async (e) => {
         filetype: file.type
       });
     } catch (err) {
-      alert('Error al subir el archivo.');
+      alert('Error al subir el archivo a Cloudinary.');
+      console.error(err);
       return;
     }
   } else {
