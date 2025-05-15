@@ -5,20 +5,21 @@ const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messages = document.getElementById('messages');
 const userList = document.getElementById('user-list');
+const fileInput = document.getElementById('file-input');
 
 const username = localStorage.getItem('username');
 if (!username) window.location.href = 'login.html';
 
 const sanitize = (text) => {
-  const temp = document.createElement('div');
-  temp.textContent = text;
-  return temp.innerHTML;
+  const temp = document.createElement('div');
+  temp.textContent = text;
+  return temp.innerHTML;
 };
 
 const convertLinks = (text) => {
-  return text.replace(/(https?:\/\/[^\s]+)/g,
-    (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
-  );
+  return text.replace(/(https?:\/\/[^\s]+)/g,
+    (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+  );
 };
 
 const appendMessage = ({ user, message, filename }) => {
@@ -30,7 +31,7 @@ const appendMessage = ({ user, message, filename }) => {
   if (isImage && message.startsWith('http')) {
     html += `<br><img src="${message}" alt="${filename || 'imagen'}" style="max-width: 200px; border-radius: 8px;" />`;
   } else if (message.startsWith('http')) {
-    html += `<br><a href="${message}" target="_blank" download>📎 ${filename || 'Archivo'}</a>`;
+    html += `<br><a href="${message}" target="_blank" download>📎 ${sanitize(filename) || 'Archivo'}</a>`;
   } else {
     html += `<span>${convertLinks(sanitize(message))}</span>`;
   }
@@ -41,9 +42,9 @@ const appendMessage = ({ user, message, filename }) => {
 };
 
 const showChat = () => {
-  chatContainer.hidden = false;
-  socket.emit('user joined', username);
-  input.focus();
+  chatContainer.hidden = false;
+  socket.emit('user joined', username);
+  input.focus();
 };
 
 const uploadToCloudinary = async (file) => {
@@ -63,43 +64,54 @@ const uploadToCloudinary = async (file) => {
   return data.secure_url;
 };
 
+const resetForm = () => {
+  input.value = '';
+  fileInput.value = '';
+};
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const msg = input.value.trim();
-  const file = document.getElementById('file-input').files[0];
+  const file = fileInput.files[0];
 
   if (!msg && !file) return;
 
   if (file) {
-    const fileUrl = await uploadToCloudinary(file);
-    socket.emit('chat message', {
-      user: username,
-      message: fileUrl,
-      filename: file.name,
-      filetype: file.type
-    });
+    try {
+      const fileUrl = await uploadToCloudinary(file);
+      socket.emit('chat message', {
+        user: username,
+        message: fileUrl,
+        filename: file.name,
+        filetype: file.type
+      });
+    } catch (err) {
+      alert('Error al subir el archivo.');
+      return;
+    }
   } else {
     socket.emit('chat message', { user: username, message: msg });
   }
 
-  input.value = '';
-  document.getElementById('file-input').value = '';
+  resetForm();
 });
 
 socket.on('chat message', appendMessage);
+
 socket.on('chat history', (history) => {
-  messages.innerHTML = '';
-  history.forEach(appendMessage);
+  messages.innerHTML = '';
+  history.forEach(appendMessage);
 });
+
 socket.on('user list', (users) => {
-  userList.innerHTML = `<strong>Usuarios conectados:</strong><br>${users.map(u => `• ${u}`).join('<br>')}`;
+  userList.innerHTML = `<strong>Usuarios conectados:</strong><br>${users.map(u => `• ${u}`).join('<br>')}`;
 });
 
 socket.on('username error', (msg) => {
-  alert(msg); 
-  localStorage.removeItem('username'); 
-  window.location.href = 'login.html'; 
+  alert(msg);
+  localStorage.removeItem('username');
+  window.location.href = 'login.html';
 });
 
 showChat();
